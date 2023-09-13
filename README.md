@@ -48,10 +48,12 @@
 
 This project was developed to learn the Go language by practice. It is a simple game where you can choose a monster and fight it. and simple BMI calculator.
 
+
 ## Features ##
 
 - [x] BMI Calculator
 - [x] Monster Slayer
+![Alt text](assets/ms-game.gif)
 
 ## Technologies ##
 
@@ -82,7 +84,8 @@ $ go get github.com/johnmerga/mastering_go/monster-slayer
 $ go run main.go
 
 # the game will start or just run the executable file
-```````
+```
+
 
 ## License ##
 
