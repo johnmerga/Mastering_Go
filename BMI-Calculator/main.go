@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bmi/functions"
 	"fmt"
+	"github.com/johnmerga/Go-Practice/BMI/functions"
 )
 
 func main() {
