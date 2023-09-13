@@ -3,13 +3,13 @@ package interaction
 import (
 	"fmt"
 
+	asciiArt "github.com/common-nighthawk/go-figure"
 	"github.com/johnmerga/Go-Practice/Monster-Slayer/helper"
 )
 
 func StartGame() {
-	println("--------------------------------------")
-	println("           MONSTER SLAYER")
-	println("--------------------------------------")
+	asciiArt.NewFigure("           MONSTER  SLAYER", "", true).Scroll(5000, 200, "right")
+	asciiArt.NewFigure("--------------------------------------", "", true).Print()
 	println()
 	println()
 }
@@ -32,10 +32,10 @@ func PrintHealth(playerHealth, monsterHealth int8) {
 func EndGame(winner string) {
 	switch winner {
 	case helper.USER:
-		println("CONGRATULATIONS")
+		asciiArt.NewColorFigure("CONGRATULATIONS", "", "green", true).Blink(10000, 500, -1)
 		println("You Won the Game")
 	case helper.MONSTER:
-		println("GAME OVER!!!")
+		asciiArt.NewColorFigure("GAME OVER", "", "red", true).Blink(10000, 500, -1)
 	}
 
 }
