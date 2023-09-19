@@ -1,29 +1,42 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/johnmerga/Mastering_Go/snippetbox/internal/models"
 )
 
 type application struct {
 	infoLog *log.Logger
 	errLog  *log.Logger
+	snippet *models.SnippetModel
 }
 
 func main() {
 	//cmd example: go run ./ -port=":5000"
 	port := flag.String("port", ":4000", "your custom port that belongs between (3000-9000)")
+	dsn := flag.String("dsn", "root:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-
+	dbPool, err := openDb(*dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 	app := &application{
 		infoLog: infoLog,
 		errLog:  errorLog,
+		snippet: &models.SnippetModel{
+			DB: dbPool,
+		},
 	}
+	defer dbPool.Close()
 
 	srv := &http.Server{
 		Addr:     *port,
@@ -35,4 +48,15 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+}
+
+func openDb(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, nil
 }

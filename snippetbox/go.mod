@@ -2,5 +2,4 @@ module github.com/johnmerga/Mastering_Go/snippetbox
 
 go 1.21.0
 
-require (
-)
+require github.com/go-sql-driver/mysql v1.7.1 // indirect
