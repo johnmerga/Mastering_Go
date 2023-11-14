@@ -12,18 +12,18 @@ import (
 )
 
 type application struct {
-	infoLog *log.Logger
-	errLog  *log.Logger
-	snippet *models.SnippetModel
+	infoLog  *log.Logger
+	errLog   *log.Logger
+	snippets *models.SnippetModel
 }
 
 func main() {
 	//cmd example: go run ./ -port=":5000"
 	port := flag.String("port", ":4000", "your custom port that belongs between (3000-9000)")
-	dsn := flag.String("dsn", "root:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
+	dsn := flag.String("dsn", "web:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	infoLog := log.New(os.Stdout, "INFO\t|", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	dbPool, err := openDb(*dsn)
 	if err != nil {
@@ -32,7 +32,7 @@ func main() {
 	app := &application{
 		infoLog: infoLog,
 		errLog:  errorLog,
-		snippet: &models.SnippetModel{
+		snippets: &models.SnippetModel{
 			DB: dbPool,
 		},
 	}
@@ -43,7 +43,7 @@ func main() {
 		ErrorLog: app.errLog,
 		Handler:  app.routes(),
 	}
-	infoLog.Printf("starting server on port %v", *port)
+	infoLog.Printf("| starting server on port %v", *port)
 	if err := srv.ListenAndServe(); err != nil {
 		errorLog.Fatal(err)
 	}
@@ -55,6 +55,7 @@ func openDb(dsn string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// create a connection and check for any errors
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}

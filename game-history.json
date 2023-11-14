@@ -1,0 +1,12 @@
+[{"Round":1,"MonsterHealth":90,"PlayerHealth":89,"MonsterAttacks":11,"PlayerAttacks":10,"SpecialAttack":0,"PlayerHeals":0,"Winner":""}
+,{"Round":2,"MonsterHealth":90,"PlayerHealth":88,"MonsterAttacks":12,"PlayerAttacks":0,"SpecialAttack":0,"PlayerHeals":13,"Winner":""}
+,{"Round":3,"MonsterHealth":76,"PlayerHealth":68,"MonsterAttacks":20,"PlayerAttacks":14,"SpecialAttack":0,"PlayerHeals":0,"Winner":""}
+,{"Round":4,"MonsterHealth":76,"PlayerHealth":58,"MonsterAttacks":20,"PlayerAttacks":0,"SpecialAttack":0,"PlayerHeals":10,"Winner":""}
+,{"Round":5,"MonsterHealth":61,"PlayerHealth":48,"MonsterAttacks":10,"PlayerAttacks":15,"SpecialAttack":0,"PlayerHeals":0,"Winner":""}
+,{"Round":6,"MonsterHealth":40,"PlayerHealth":28,"MonsterAttacks":20,"PlayerAttacks":0,"SpecialAttack":21,"PlayerHeals":0,"Winner":""}
+,{"Round":7,"MonsterHealth":40,"PlayerHealth":27,"MonsterAttacks":15,"PlayerAttacks":0,"SpecialAttack":0,"PlayerHeals":14,"Winner":""}
+,{"Round":8,"MonsterHealth":28,"PlayerHealth":10,"MonsterAttacks":17,"PlayerAttacks":12,"SpecialAttack":0,"PlayerHeals":0,"Winner":""}
+,{"Round":9,"MonsterHealth":28,"PlayerHealth":2,"MonsterAttacks":20,"PlayerAttacks":0,"SpecialAttack":0,"PlayerHeals":12,"Winner":""}
+,{"Round":10,"MonsterHealth":18,"PlayerHealth":-8,"MonsterAttacks":10,"PlayerAttacks":10,"SpecialAttack":0,"PlayerHeals":0,"Winner":""}
+,{"Round":11,"MonsterHealth":0,"PlayerHealth":0,"MonsterAttacks":0,"PlayerAttacks":0,"SpecialAttack":0,"PlayerHeals":0,"Winner":"Monster"}
+]
