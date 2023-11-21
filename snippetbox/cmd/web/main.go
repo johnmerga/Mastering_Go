@@ -13,9 +13,10 @@ import (
 )
 
 type application struct {
-	infoLog  *log.Logger
-	errLog   *log.Logger
-	snippets *models.SnippetModel
+	infoLog       *log.Logger
+	errLog        *log.Logger
+	snippets      *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -26,7 +27,14 @@ func main() {
 
 	infoLog := log.New(os.Stdout, "INFO\t|", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
 	dbPool, err := openDb(*dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer dbPool.Close()
+
+	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
@@ -36,8 +44,8 @@ func main() {
 		snippets: &models.SnippetModel{
 			DB: dbPool,
 		},
+		templateCache: templateCache,
 	}
-	defer dbPool.Close()
 
 	srv := &http.Server{
 		Addr:     *port,

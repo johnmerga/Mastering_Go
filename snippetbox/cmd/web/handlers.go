@@ -3,10 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
-
-	"text/template"
 
 	"github.com/johnmerga/Mastering_Go/snippetbox/internal/models"
 )
