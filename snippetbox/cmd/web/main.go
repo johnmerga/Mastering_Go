@@ -22,7 +22,7 @@ type application struct {
 func main() {
 	//cmd example: go run ./ -port=":5000"
 	port := flag.String("port", ":4000", "your custom port that belongs between (3000-9000)")
-	dsn := flag.String("dsn", "root:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
+	dsn := flag.String("dsn", "web:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t|", log.Ldate|log.Ltime)

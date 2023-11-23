@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"path/filepath"
 
@@ -14,6 +15,8 @@ type templateData struct {
 
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := make(map[string]*template.Template)
+	test, _ := filepath.Glob("*")
+	fmt.Println(test)
 	pages, err := filepath.Glob("../../ui/html/pages/*.tmpl.html")
 	if err != nil {
 		return nil, err
