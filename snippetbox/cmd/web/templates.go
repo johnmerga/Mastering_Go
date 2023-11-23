@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"path/filepath"
 
@@ -9,14 +8,14 @@ import (
 )
 
 type templateData struct {
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CurrentYear int
+	CSRFToken   string
+	Snippet     *models.Snippet
+	Snippets    []*models.Snippet
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := make(map[string]*template.Template)
-	test, _ := filepath.Glob("*")
-	fmt.Println(test)
 	pages, err := filepath.Glob("../../ui/html/pages/*.tmpl.html")
 	if err != nil {
 		return nil, err

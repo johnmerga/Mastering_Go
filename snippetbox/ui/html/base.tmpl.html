@@ -1,5 +1,5 @@
 {{define "base"}}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -24,8 +24,10 @@
       {{template "nav" .}}
     </header>
     <main>{{template "main" .}}</main>
-    <footer>Powered by <a href="https://golang.org/">Go</a></footer>
-		<script src="/static/js/main.js" type="text/javascript"></script>
+    <footer>
+      Powered by <a href="https://golang.org/">Go </a> {{.CurrentYear}}
+    </footer>
+    <script src="/static/js/main.js" type="text/javascript"></script>
   </body>
 </html>
 {{end}}
