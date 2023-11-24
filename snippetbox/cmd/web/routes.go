@@ -11,5 +11,5 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("/home", app.home)
 	mux.HandleFunc("/snippet/view", app.snippetView)
 	mux.HandleFunc("/snippet/create", app.snippetCreate)
-	return secureHeaders(mux)
+	return app.recoverPanic(app.logger(secureHeaders(mux)))
 }
