@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"github.com/fatih/color"
 	"html/template"
 	"log"
 	"net/http"
@@ -25,13 +26,16 @@ func main() {
 	dsn := flag.String("dsn", "web:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
 	flag.Parse()
 
-	infoLog := log.New(os.Stdout, "INFO\t|", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	infoColor := color.New(color.FgCyan).Add(color.Bold)
+	errorColor := color.New(color.FgRed).Add(color.Bold)
+	infoLog := log.New(os.Stdout, infoColor.Sprint("INFO:\t"), log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, errorColor.Sprint("ERROR\t"), log.Ldate|log.Ltime|log.Lshortfile)
 
 	dbPool, err := openDb(*dsn)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
+	infoLog.Println("Database connection successfully opened")
 	defer dbPool.Close()
 
 	templateCache, err := newTemplateCache()
@@ -52,7 +56,8 @@ func main() {
 		ErrorLog: app.errLog,
 		Handler:  app.routes(),
 	}
-	infoLog.Printf("| starting server on port %v", *port)
+	pColor := color.New(color.FgGreen).Add(color.ResetItalic)
+	infoLog.Printf("- 🚀starting server on PORT%s", pColor.Sprint(*port))
 	if err := srv.ListenAndServe(); err != nil {
 		errorLog.Fatal(err)
 	}
