@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-	infoLog.Println("Database connection successfully opened")
+	infoLog.Println(color.GreenString("Database connection established successfully"))
 	defer dbPool.Close()
 
 	templateCache, err := newTemplateCache()
