@@ -9,12 +9,18 @@ import (
 
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.notFound(w)
+	})
 	fileServer := http.FileServer(http.Dir("../../ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
+	// if it only starts with '/' redirect to /home
+	router.HandlerFunc(http.MethodGet, "/", app.home)
 	router.HandlerFunc(http.MethodGet, "/home", app.home)
 	router.HandlerFunc(http.MethodGet, "/snippet/view/:id", app.snippetView)
-	router.HandlerFunc(http.MethodGet, "/snippet/create", app.snippetCreate)
+	router.HandlerFunc(http.MethodGet, "/snippet/create", app.snippetForm)
+	router.HandlerFunc(http.MethodPost, "/snippet/create", app.snippetCreatePost)
 	standardMiddleware := alice.New(app.recoverPanic, app.logger, secureHeaders)
 	return standardMiddleware.Then(router)
 }
