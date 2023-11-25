@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"strconv"
 	"time"
 )
 
@@ -44,4 +45,29 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 	}
+}
+
+type newSnippet struct {
+	Title   string
+	Content string
+	Created time.Time
+	Expires int
+}
+
+func formValidator(r http.Request) (newSnippet, error) {
+	if err := r.ParseForm(); err != nil {
+		return newSnippet{}, err
+	}
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		return newSnippet{}, err
+	}
+	data := newSnippet{
+		Title:   title,
+		Content: content,
+		Expires: expires,
+	}
+	return data, nil
 }
