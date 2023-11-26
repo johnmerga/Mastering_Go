@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
-	"strconv"
-	"strings"
 	"time"
-	"unicode/utf8"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -47,50 +44,4 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 	}
-}
-
-type snippetCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
-}
-
-func formValidator(r http.Request) (*snippetCreateForm, error) {
-	if err := r.ParseForm(); err != nil {
-		return &snippetCreateForm{}, err
-	}
-	title := r.PostForm.Get("title")
-	content := r.PostForm.Get("content")
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-	errFields := make(map[string]string)
-	if err != nil {
-		errFields["expires"] = "Please select a valid expiry time"
-	}
-	if strings.TrimSpace(title) == "" {
-		errFields["title"] = "Title field cannot be empty"
-	} else if utf8.RuneCountInString(title) > 100 {
-		errFields["title"] = "Title field cannot be more than 100 characters"
-	}
-	if strings.TrimSpace(content) == "" {
-		errFields["content"] = "Content field cannot be empty"
-	}
-	if !(expires == 1 || expires == 7 || expires == 365) {
-		errFields["expires"] = "Please select a valid expiry time"
-	}
-	form := snippetCreateForm{
-		Title:       title,
-		Content:     content,
-		Expires:     expires,
-		FieldErrors: errFields,
-	}
-	if len(errFields) > 0 {
-		return &form, nil
-	}
-	data := snippetCreateForm{
-		Title:   title,
-		Content: content,
-		Expires: expires,
-	}
-	return &data, nil
 }

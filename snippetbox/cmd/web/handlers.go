@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/johnmerga/Mastering_Go/snippetbox/internal/models"
+	"github.com/johnmerga/Mastering_Go/snippetbox/internal/valiator"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -50,23 +51,45 @@ func (app *application) snippetForm(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "snippet.form.tmpl.html", data)
 }
 
+type snippetCreateForm struct {
+	Title   string
+	Content string
+	Expires int
+	valiator.Validator
+}
+
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	inputData, err := formValidator(*r)
+	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		return
 	}
-	if len(inputData.FieldErrors) > 0 {
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+	form := snippetCreateForm{
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
+		Expires: expires,
+		// Remove the FieldErrors assignment from here.
+	}
+	form.CheckField(valiator.NotBlank(form.Title), "title", "This field cannot be blank")
+	form.CheckField(valiator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
+	form.CheckField(valiator.NotBlank(form.Content), "content", "This field cannot be blank")
+	form.CheckField(valiator.PermittedInt(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7 or 365")
+
+	if !form.Valid() {
 		data := app.newTemplateData(r)
-		data.Form = inputData
+		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "snippet.form.tmpl.html", data)
 		return
 	}
-	id, err := app.snippets.Insert(inputData.Title, inputData.Content, inputData.Expires)
-
+	id, err := app.snippets.Insert(form.Title, form.Content, form.Expires)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	// Redirect the user to the relevant page for the snippet.
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
