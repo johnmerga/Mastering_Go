@@ -68,7 +68,7 @@ Before starting, you need to have [Go](https://golang.org/) installed
 
 or you can download the executable file the my [releases](v1.0.0) page for both windows and linux.
 
-## Starting ##
+## Starting for Monster Slayer Game
 
 ```bash
 # Clone this project
@@ -86,6 +86,25 @@ $ go run main.go
 # the game will start or just run the executable file
 ```
 
+## Starting for Snippetbox
+
+```bash
+# Clone this project
+$ git clone https://github.com/johnmerga/mastering_go
+
+# Access
+$ cd mastering_go/snippetbox
+# create tls folder and generate tls certificate
+$ mkdir tls
+$ cd tls
+# generate tls certificate for linux users
+$ go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
+# go back to root folder
+$ cd ../../
+# start the snippetbox server
+$ make run-snippetbox
+# go to https://localhost:4000
+```
 
 ## License ##
 
