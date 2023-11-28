@@ -14,7 +14,7 @@ type templateData struct {
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 	Form        any
-	Flash       any
+	Flash       string
 }
 
 func humanDate(t time.Time) string {
