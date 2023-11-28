@@ -72,7 +72,7 @@ func main() {
 	}
 	pColor := color.New(color.FgGreen).Add(color.ResetItalic)
 	infoLog.Printf("- 🚀starting server on PORT%s", pColor.Sprint(*port))
-	if err := srv.ListenAndServe(); err != nil {
+	if err := srv.ListenAndServeTLS("../../tls/cert.pem", "../../tls/key.pem"); err != nil {
 		errorLog.Fatal(err)
 	}
 
