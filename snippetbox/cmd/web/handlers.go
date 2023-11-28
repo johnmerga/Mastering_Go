@@ -52,28 +52,22 @@ func (app *application) snippetForm(w http.ResponseWriter, r *http.Request) {
 }
 
 type snippetCreateForm struct {
-	Title   string
-	Content string
-	Expires int
-	valiator.Validator
+	Title              string `form:"title"`
+	Content            string `form:"content"`
+	Expires            int    `form:"expires"`
+	valiator.Validator `form:"-"`
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form snippetCreateForm
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
-	}
-	form := snippetCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
-		// Remove the FieldErrors assignment from here.
 	}
 	form.CheckField(valiator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.CheckField(valiator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
