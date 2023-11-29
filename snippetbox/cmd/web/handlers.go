@@ -24,6 +24,11 @@ type signupForm struct {
 	Password           string `form:"password"`
 	valiator.Validator `form:"-"`
 }
+type loginForm struct {
+	Email              string `form:"email"`
+	Password           string `form:"password"`
+	valiator.Validator `form:"-"`
+}
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
@@ -100,6 +105,7 @@ func (app *application) userSignupForm(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// post signUp
 func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	var form signupForm
 	err := app.decodePostForm(r, &form)
