@@ -23,6 +23,7 @@ type application struct {
 	infoLog        *log.Logger
 	errLog         *log.Logger
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    form.Decoder
 	sessionManager *scs.SessionManager
@@ -56,11 +57,10 @@ func main() {
 	sessionManager.Store = mysqlstore.New(dbPool)
 	sessionManager.Lifetime = time.Hour * 12
 	app := &application{
-		infoLog: infoLog,
-		errLog:  errorLog,
-		snippets: &models.SnippetModel{
-			DB: dbPool,
-		},
+		infoLog:        infoLog,
+		errLog:         errorLog,
+		snippets:       &models.SnippetModel{DB: dbPool},
+		users:          &models.UserModel{DB: dbPool},
 		templateCache:  templateCache,
 		formDecoder:    *formDecoder,
 		sessionManager: sessionManager,

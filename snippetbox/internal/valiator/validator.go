@@ -1,6 +1,7 @@
 package valiator
 
 import (
+	"regexp"
 	"strings"
 	"unicode/utf8"
 )
@@ -9,13 +10,13 @@ type Validator struct {
 	FieldErrors map[string]string
 }
 
+var EmailRX = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
 // Valid() returns true if the FieldErrors map doesn't contain any entries.
 func (v *Validator) Valid() bool {
 	return len(v.FieldErrors) == 0
 }
 
-// AddFieldError() adds an error message to the FieldErrors map (so long as no
-// entry already exists for the given key).
 func (v *Validator) AddFieldError(key, message string) {
 	// Note: We need to initialize the map first, if it isn't already
 	// initialized.
@@ -27,7 +28,6 @@ func (v *Validator) AddFieldError(key, message string) {
 	}
 }
 
-// CheckField() adds an error message to the FieldErrors map only if a
 // validation check is not 'ok'.
 func (v *Validator) CheckField(ok bool, key, message string) {
 	if !ok {
@@ -53,4 +53,12 @@ func PermittedInt(value int, permittedValues ...int) bool {
 		}
 	}
 	return false
+}
+
+func MinChars(value string, n int) bool {
+	return utf8.RuneCountInString(value) >= n
+}
+
+func Matches(value string, rx *regexp.Regexp) bool {
+	return rx.MatchString(value)
 }

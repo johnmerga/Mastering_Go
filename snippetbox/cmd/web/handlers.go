@@ -11,6 +11,20 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+type snippetCreateForm struct {
+	Title              string `form:"title"`
+	Content            string `form:"content"`
+	Expires            int    `form:"expires"`
+	valiator.Validator `form:"-"`
+}
+
+type signupForm struct {
+	Name               string `form:"name"`
+	Email              string `form:"email"`
+	Password           string `form:"password"`
+	valiator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -51,20 +65,9 @@ func (app *application) snippetForm(w http.ResponseWriter, r *http.Request) {
 	app.render(w, http.StatusOK, "snippet.form.tmpl.html", data)
 }
 
-type snippetCreateForm struct {
-	Title              string `form:"title"`
-	Content            string `form:"content"`
-	Expires            int    `form:"expires"`
-	valiator.Validator `form:"-"`
-}
-
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	var form snippetCreateForm
 	err := app.decodePostForm(r, &form)
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -87,4 +90,59 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	}
 	app.sessionManager.Put(r.Context(), "flash", "New Snippet created successfully")
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
+}
+
+// user related
+func (app *application) userSignupForm(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = signupForm{}
+	app.render(w, http.StatusOK, "signUp.tmpl.html", data)
+	return
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	var form signupForm
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+	form.CheckField(valiator.NotBlank(form.Name), "name", "name should not be blank")
+	form.CheckField(valiator.MaxChars(form.Name, 50), "name", "name should not be more than 50 characters")
+	form.CheckField(valiator.NotBlank(form.Email), "email", "email should not be blank")
+	form.CheckField(valiator.MaxChars(form.Email, 80), "email", "email should not be more than 50 characters")
+	form.CheckField(valiator.Matches(form.Email, valiator.EmailRX), "email", "email should be valid")
+	form.CheckField(valiator.NotBlank(form.Password), "password", "password should not be blank")
+	form.CheckField(valiator.MinChars(form.Password, 10), "password", "password should be at least 10 characters")
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, http.StatusBadRequest, "signUp.tmpl.html", data)
+		return
+	}
+	err = app.users.Create(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			form.AddFieldError("email", "Email address is already in use")
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, http.StatusBadRequest, "signUp.tmpl.html", data)
+			return
+		}
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(r.Context(), "flash", "user successfully created. please login")
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *application) userLoginForm(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Authenticate and login the user...")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Logout the user...")
 }
