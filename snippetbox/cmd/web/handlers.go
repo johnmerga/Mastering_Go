@@ -141,8 +141,11 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
-func (app *application) userLoginForm(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
+func (app *application) loginForm(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = loginForm{}
+	app.render(w, http.StatusOK, "login.tmpl.html", data)
+	return
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
