@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -65,10 +66,24 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256}, // add curve preferences as you see fit
+		MinVersion:       tls.VersionTLS12,                         // TLS 1.2 is the minimum version we should support
+		// Restricting cipher suites
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		},
+	}
 	srv := &http.Server{
-		Addr:     *port,
-		ErrorLog: app.errLog,
-		Handler:  app.routes(),
+		Addr:      *port,
+		ErrorLog:  app.errLog,
+		Handler:   app.routes(),
+		TLSConfig: tlsConfig,
 	}
 	pColor := color.New(color.FgGreen).Add(color.ResetItalic)
 	infoLog.Printf("- 🚀starting server on PORT%s", pColor.Sprint(*port))
