@@ -84,6 +84,10 @@ func main() {
 		ErrorLog:  app.errLog,
 		Handler:   app.routes(),
 		TLSConfig: tlsConfig,
+		// Add Idle, Read and Write timeouts to the server.
+		IdleTimeout:  time.Minute,      // used to close the connection if the client has been idle for a while
+		ReadTimeout:  5 * time.Second,  // used to limit the time the server will wait to read the request body
+		WriteTimeout: 10 * time.Second, // used to limit the time the server will wait before writing a response
 	}
 	pColor := color.New(color.FgGreen).Add(color.ResetItalic)
 	infoLog.Printf("- 🚀starting server on PORT%s", pColor.Sprint(*port))
