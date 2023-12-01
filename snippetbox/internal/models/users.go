@@ -43,9 +43,33 @@ func (m *UserModel) Create(name, email, password string) error {
 }
 
 func (m *UserModel) AuthenticateUser(email, password string) (int, error) {
-	return 0, nil
+	var id int
+	var hashedPassword []byte
+	stmt := "SELECT id,hashed_password FROM users WHERE email=?"
+	row := m.DB.QueryRow(stmt, email)
+	err := row.Scan(&id, &hashedPassword)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, ErrInvalidCredentials
+		}
+		return 0, err
+	}
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return 0, ErrInvalidCredentials
+		}
+		return 0, err
+	}
+	return id, nil
 }
 
 func (m *UserModel) Exists(id int) (bool, error) {
-	return false, nil
+	row := m.DB.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id=?)", id)
+	var exists bool
+	err := row.Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }

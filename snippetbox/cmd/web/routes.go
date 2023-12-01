@@ -16,19 +16,21 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave)
+	protected := dynamic.Append(app.requireAuthentication)
 	// if it only starts with '/' redirect to /home
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/home", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/snippet/view/:id", dynamic.ThenFunc(app.snippetView))
-	router.Handler(http.MethodGet, "/snippet/create", dynamic.ThenFunc(app.snippetForm))
-	router.Handler(http.MethodPost, "/snippet/create", dynamic.ThenFunc(app.snippetCreatePost))
+
+	router.Handler(http.MethodGet, "/snippet/create", protected.ThenFunc(app.snippetForm))
+	router.Handler(http.MethodPost, "/snippet/create", protected.ThenFunc(app.snippetCreatePost))
 
 	// Add the five new routes, all of which use our 'dynamic' middleware chain.
 	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(app.userSignupForm))
 	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(app.userSignupPost))
-	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.userLoginForm))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.loginForm))
 	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
-	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(app.userLogoutPost))
+	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
 	standardMiddleware := alice.New(app.recoverPanic, app.logger, secureHeaders)
 	return standardMiddleware.Then(router)
 }
