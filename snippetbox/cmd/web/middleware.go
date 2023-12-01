@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/fatih/color"
+	"github.com/justinas/nosurf"
 )
 
 func secureHeaders(next http.Handler) http.Handler {
@@ -53,4 +54,14 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 		w.Header().Add("Cache-Control", "no-store")
 		next.ServeHTTP(w, r)
 	})
+}
+
+func noSurf(next http.Handler) http.Handler {
+	csrfHandler := nosurf.New(next)
+	csrfHandler.SetBaseCookie(http.Cookie{
+		HttpOnly: true, // this means that the cookie cannot be accessed by client side javascript
+		Path:     "/",  // this means that the cookie is valid for all paths on our site
+		Secure:   true, // this means that the cookie will only be sent over HTTPS
+	})
+	return csrfHandler
 }
