@@ -5,4 +5,4 @@ import (
 )
 
 //go:embed "html" "static"
-var FS embed.FS
+var Files embed.FS

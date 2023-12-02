@@ -14,7 +14,7 @@ func (app *application) routes() http.Handler {
 		app.notFound(w)
 	})
 
-	fileServer := http.FileServer(http.FS(ui.FS)) // ui.FS is the embedded file system
+	fileServer := http.FileServer(http.FS(ui.Files)) // ui.FS is the embedded file system
 	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
 
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
