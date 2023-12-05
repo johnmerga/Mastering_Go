@@ -17,6 +17,9 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.FS(ui.Files)) // ui.FS is the embedded file system
 	router.Handler(http.MethodGet, "/static/*filepath", fileServer)
 
+	// for testing
+	router.HandlerFunc(http.MethodGet, "/ping", ping)
+
 	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 	protected := dynamic.Append(app.requireAuthentication)
 	// if it only starts with '/' redirect to /home
