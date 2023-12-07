@@ -6,7 +6,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"regexp"
 	"testing"
 	"time"
@@ -70,18 +72,18 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 	ts := httptest.NewTLSServer(h)
 	// Initialize a new cookie jar.
 
-	// jar, err := cookiejar.New(nil)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Add the cookie jar to the test server client. Any response cookies will
 	// now be stored and sent with subsequent requests when using this client.
 
-	// ts.Client().Jar = jar
-	// ts.Client().CheckRedirect = func(req *http.Request, via []*http.Request) error {
-	// 	return http.ErrUseLastResponse
-	// }
+	ts.Client().Jar = jar
+	ts.Client().CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
 
 	// Disable redirect-following for the test server client by setting a custom
 	// CheckRedirect function. This function will be called whenever a 3xx
@@ -94,7 +96,6 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 // get method
 func (ts *testServer) get(t *testing.T, urlPath string) (statusCode int, header http.Header, body string) {
 	res, err := ts.Client().Get(ts.URL + urlPath)
-	println(ts.URL + "/" + urlPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,9 +108,7 @@ func (ts *testServer) get(t *testing.T, urlPath string) (statusCode int, header 
 	return res.StatusCode, res.Header, string(rBody)
 }
 
-func TestUserSignup(t *testing.T) {
-	// Create the application struct containing our mocked dependencies and set
-	// up the test server for running an end-to-end test.
+func TestUserSignup(t *testing.T) { // up the test server for running an end-to-end test.
 	app := newTestApplication(t)
 	ts := newTestServer(t, app.routes())
 	defer ts.Close()
@@ -121,6 +120,22 @@ func TestUserSignup(t *testing.T) {
 	// The t.Logf() function works in the same way as fmt.Printf(), but writes
 	// the provided message to the test output.
 	t.Logf("CSRF token is: %q", csrfToken)
+}
+
+func (ts *testServer) postForm(t *testing.T, urlPath string, form url.Values) (int, http.Header, string) {
+	rs, err := ts.Client().PostForm(ts.URL+urlPath, form)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Read the response body from the test server.
+	defer rs.Body.Close()
+	body, err := io.ReadAll(rs.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bytes.TrimSpace(body)
+	// Return the response status, headers and body.
+	return rs.StatusCode, rs.Header, string(body)
 }
 
 //	func newTestApplication(t *testing.T) *application {
