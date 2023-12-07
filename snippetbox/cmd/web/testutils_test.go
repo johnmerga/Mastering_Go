@@ -18,18 +18,19 @@ import (
 
 // Define a regular expression which captures the CSRF token value from the
 // HTML for our user signup page.
-var csrfTokenRX = regexp.MustCompile(`<input type='hidden' name='csrf_token' value='(.+)'>`)
+var csrfTokenRX = regexp.MustCompile(`<input type=\"hidden\" name=\"csrf_token\" value=\"(.+)\" .>`)
 
+// var test := " <input type="hidden" name="csrf_token" value="(.+)'" />"
 func extractCSRFToken(t *testing.T, body string) string {
 	// Use the FindStringSubmatch method to extract the token from the HTML body.
 	// Note that this returns an array with the entire matched pattern in the
 	// first position, and the values of any captured data in the subsequent
 	// positions.
 	matches := csrfTokenRX.FindStringSubmatch(body)
-	t.Log(matches)
 	if len(matches) < 2 {
 		t.Fatal("no csrf token found in body")
 	}
+	// Unescape the token value.
 	return html.UnescapeString(string(matches[1]))
 }
 
@@ -92,7 +93,7 @@ func newTestServer(t *testing.T, h http.Handler) *testServer {
 
 // get method
 func (ts *testServer) get(t *testing.T, urlPath string) (statusCode int, header http.Header, body string) {
-	res, err := ts.Client().Get(ts.URL + "/" + urlPath)
+	res, err := ts.Client().Get(ts.URL + urlPath)
 	println(ts.URL + "/" + urlPath)
 	if err != nil {
 		t.Fatal(err)
@@ -114,8 +115,7 @@ func TestUserSignup(t *testing.T) {
 	defer ts.Close()
 	// Make a GET /user/signup request and then extract the CSRF token from the
 	// response body.
-	_, _, body := ts.get(t, "user/signup")
-	println(body)
+	_, _, body := ts.get(t, "/user/signup")
 	csrfToken := extractCSRFToken(t, body)
 	// Log the CSRF token value in our test output using the t.Logf() function.
 	// The t.Logf() function works in the same way as fmt.Printf(), but writes
