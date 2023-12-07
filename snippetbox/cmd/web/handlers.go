@@ -122,7 +122,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	if !form.Valid() {
 		data := app.newTemplateData(r)
 		data.Form = form
-		app.render(w, http.StatusBadRequest, "signUp.tmpl.html", data)
+		app.render(w, http.StatusUnprocessableEntity, "signUp.tmpl.html", data)
 		return
 	}
 	err = app.users.Create(form.Name, form.Email, form.Password)
@@ -131,7 +131,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 			form.AddFieldError("email", "Email address is already in use")
 			data := app.newTemplateData(r)
 			data.Form = form
-			app.render(w, http.StatusBadRequest, "signUp.tmpl.html", data)
+			app.render(w, http.StatusUnprocessableEntity, "signUp.tmpl.html", data)
 			return
 		}
 		app.serverError(w, err)
