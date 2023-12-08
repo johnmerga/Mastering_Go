@@ -41,5 +41,3 @@ hashed_password CHAR(60) NOT NULL,
 created DATETIME NOT NULL
 );
 ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);
-
-
