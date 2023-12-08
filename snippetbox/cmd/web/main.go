@@ -27,12 +27,14 @@ type application struct {
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
+	debug          bool
 }
 
 func main() {
 	//cmd example: go run ./ -port=":5000"
 	port := flag.String("port", ":4000", "your custom port that belongs between (3000-9000)")
 	dsn := flag.String("dsn", "web:password@tcp(127.0.0.1:3306)/snippetbox?parseTime=true", "MySQL data source name")
+	debug := flag.Bool("debug", false, "enable debug mode")
 	flag.Parse()
 
 	infoColor := color.New(color.FgCyan).Add(color.Bold)
@@ -64,6 +66,7 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
+		debug:          *debug,
 	}
 
 	tlsConfig := &tls.Config{

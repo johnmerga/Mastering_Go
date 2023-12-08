@@ -25,6 +25,7 @@ func (app *application) routes() http.Handler {
 	// if it only starts with '/' redirect to /home
 	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(app.home))
 	router.Handler(http.MethodGet, "/home", dynamic.ThenFunc(app.home))
+	router.Handler(http.MethodGet, "/about", dynamic.ThenFunc(app.about))
 	router.Handler(http.MethodGet, "/snippet/view/:id", dynamic.ThenFunc(app.snippetView))
 
 	router.Handler(http.MethodGet, "/snippet/create", protected.ThenFunc(app.snippetForm))
