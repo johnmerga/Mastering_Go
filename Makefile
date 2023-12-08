@@ -6,3 +6,6 @@ run-test:
 	cd ./snippetbox/cmd/web/ && go test -v . 
 run-test-cover:
 	cd ./snippetbox && go test -cover ./...
+
+run-test-single:
+	cd ./snippetbox && go test -v -run=TestSnippetCreate ./cmd/web/

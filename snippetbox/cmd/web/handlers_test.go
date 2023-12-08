@@ -47,6 +47,7 @@ func newTestApplication1(t *testing.T) *application {
 		sessionManager: sessionManager,
 	}
 }
+
 func TestSnippetView(t *testing.T) {
 	// Create a new instance of our application struct which uses the mocked
 	// dependencies.
@@ -212,6 +213,33 @@ func TestUserSignupPost(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSnippetCreate(t *testing.T) {
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	t.Run("Unauthenticated", func(t *testing.T) {
+		code, _, _ := ts.get(t, "/snippet/create")
+		assert.Equals(t, code, http.StatusSeeOther)
+	},
+	)
+
+	t.Run("Authorized", func(t *testing.T) {
+		_, _, body := ts.get(t, "/user/login")
+		csrfToken := extractCSRFToken(t, body)
+		form := url.Values{}
+		form.Add("email", "alice@example.com")
+		form.Add("password", "pa$$word")
+		form.Add("csrf_token", csrfToken)
+		ts.postForm(t, "/user/login", form)
+		code, _, body := ts.get(t, "/snippet/create")
+		assert.Equals(t, code, http.StatusOK)
+		assert.StringContains(t, body, "<form action=\"/snippet/create\" method=\"POST\">")
+
+	},
+	)
 }
 
 // func TestPing(t *testing.T) {
