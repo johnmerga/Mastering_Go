@@ -205,3 +205,22 @@ func (app *application) about(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	app.render(w, http.StatusOK, "about.tmpl.html", data)
 }
+
+// account
+
+func (app *application) account(w http.ResponseWriter, r *http.Request) {
+	id := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	user, err := app.users.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.sessionManager.Put(r.Context(), "flash", "You must be logged in to access this page")
+			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+			return
+		}
+		app.serverError(w, err)
+		return
+	}
+	data := app.newTemplateData(r)
+	data.User = user
+	app.render(w, http.StatusOK, "account.tmpl.html", data)
+}

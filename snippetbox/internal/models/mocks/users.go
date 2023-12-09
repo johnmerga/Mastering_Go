@@ -1,6 +1,10 @@
 package mocks
 
-import "github.com/johnmerga/Mastering_Go/snippetbox/internal/models"
+import (
+	"time"
+
+	"github.com/johnmerga/Mastering_Go/snippetbox/internal/models"
+)
 
 type UserModel struct{}
 
@@ -12,12 +16,14 @@ func (m *UserModel) Create(name, email, password string) error {
 		return nil
 	}
 }
+
 func (m *UserModel) AuthenticateUser(email, password string) (int, error) {
 	if email == "alice@example.com" && password == "pa$$word" {
 		return 1, nil
 	}
 	return 0, models.ErrInvalidCredentials
 }
+
 func (m *UserModel) Exists(id int) (bool, error) {
 	switch id {
 	case 1:
@@ -25,4 +31,17 @@ func (m *UserModel) Exists(id int) (bool, error) {
 	default:
 		return false, nil
 	}
+}
+
+func (m *UserModel) Get(id int) (*models.User, error) {
+	if id == 1 {
+		u := &models.User{
+			Id:      1,
+			Name:    "Alice",
+			Email:   "alice@example.com",
+			Created: time.Now(),
+		}
+		return u, nil
+	}
+	return nil, models.ErrNoRecord
 }

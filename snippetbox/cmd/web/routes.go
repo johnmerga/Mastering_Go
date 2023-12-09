@@ -37,6 +37,7 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(app.loginForm))
 	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(app.userLoginPost))
 	router.Handler(http.MethodPost, "/user/logout", protected.ThenFunc(app.userLogoutPost))
+	router.Handler(http.MethodGet, "/account/view", protected.ThenFunc(app.account))
 	standardMiddleware := alice.New(app.recoverPanic, app.logger, secureHeaders)
 	return standardMiddleware.Then(router)
 }

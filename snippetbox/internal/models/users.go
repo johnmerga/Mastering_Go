@@ -25,6 +25,7 @@ type UserModelInterface interface {
 	Create(name, email, password string) error
 	AuthenticateUser(email, password string) (int, error)
 	Exists(id int) (bool, error)
+	Get(id int) (*User, error)
 }
 
 func (m *UserModel) Create(name, email, password string) error {
@@ -32,9 +33,9 @@ func (m *UserModel) Create(name, email, password string) error {
 	if err != nil {
 		return err
 	}
-	stms := `INSERT INTO users(name,email,hashed_password,created)
+	stmt := `INSERT INTO users(name,email,hashed_password,created)
   VALUES(?,?,?,UTC_TIMESTAMP())`
-	_, err = m.DB.Exec(stms, name, email, string(hashedPassword))
+	_, err = m.DB.Exec(stmt, name, email, string(hashedPassword))
 	if err != nil {
 		var mySQlErr *mysql.MySQLError
 		if errors.As(err, &mySQlErr) {
@@ -45,6 +46,20 @@ func (m *UserModel) Create(name, email, password string) error {
 		return err
 	}
 	return nil
+}
+
+func (m *UserModel) Get(id int) (*User, error) {
+	var user User
+	stmt := `SELECT id,name,email,created FROM users WHERE id=?`
+	// jump the third parameter
+	err := m.DB.QueryRow(stmt, id).Scan(&user.Id, &user.Name, &user.Email, &user.Created)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		}
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (m *UserModel) AuthenticateUser(email, password string) (int, error) {
