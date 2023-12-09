@@ -30,6 +30,13 @@ type loginForm struct {
 	valiator.Validator `form:"-"`
 }
 
+type passwordForm struct {
+	OldPassword        string `form:"password"`
+	NewPassword        string `form:"password"`
+	ConfirmPassword    string `form:"password"`
+	valiator.Validator `form:"-"`
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	snippets, err := app.snippets.Latest()
 	if err != nil {
@@ -229,4 +236,20 @@ func (app *application) account(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.User = user
 	app.render(w, http.StatusOK, "account.tmpl.html", data)
+}
+
+func (app *application) accountPasswordUpdateForm(w http.ResponseWriter, r *http.Request) {
+	form := passwordForm{}
+	app.decodePostForm(r, form)
+
+	form.CheckField(valiator.NotBlank(form.OldPassword), "oldPassword", "This field cannot be blank")
+	form.CheckField(valiator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
+
+	data := app.newTemplateData(r)
+	data.Form = form
+	app.render(w, http.StatusOK, "password.tmpl.html", data)
+}
+
+func (app *application) accountPasswordUpdatePost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "%+v", r.URL)
 }
