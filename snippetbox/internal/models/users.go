@@ -120,8 +120,5 @@ func (m *UserModel) PasswordUpdate(id int, oldPassword, confirmPassword string) 
 	}
 	stmt := `UPDATE users SET hashed_password=? WHERE id=?`
 	_, err = m.DB.Exec(stmt, string(new_hashed_password), id)
-	if err != nil {
-		return err
-	}
 	return nil
 }
